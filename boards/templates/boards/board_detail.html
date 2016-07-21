@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+<style type="text/css">
+ul, li {
+    display: block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+</style>
+<div class="container">
+    <h1>{{ board.name }} Board</h1>
+    <div id="users">
+        <div class="grid -between">
+            <div class="cell">
+                <form action="{% url "boards:create-thread" board.slug %}">
+                    <button type="submit" class="btn">New Thread</button>
+                </form>
+            </div>
+            <div class="cell">
+                <fieldset class="form-group">
+                    <label>Search:</label>
+                    <input type="text" placeholder="Search query" class="form-control search" autocomplete="off">
+                </fieldset>
+            </div>
+        </div>
+        <ul class="list" style="list-style-type:none">
+            {% for thread in board.thread_set.all %}
+                <li style-"list-style-type: none;">
+                    <div class="card">
+                        <header class="card-header title"><a href="{% url "boards:thread-detail" thread.board.slug thread.pk %}">{{ thread.title }}</a></header>
+                        <img src="{{ thread.image.url }}" style="max-height: 150px;">
+                        <p class="content">{{ thread.content }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <hr>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.2.0/list.min.js"></script>
+<script src="{% static 'board_filter.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+<div class="container">
+    <div style="width: 20%">
+        <img style="max-width: 150px; max-height: 150px float: left;" src="{{ thread.image.url }}">
+        <div style="float-right">
+            <p>{{ thread.title }}</p>
+            <p>{{ thread.content }}</p>
+        </div>
+    </div>
+    {% for reply in thread.reply_set.all %}
+    <div class="media">
+        <div class="media-left">
+            {% if reply.image %}
+            <div class="avatarholder">
+                    <img style="width: 4rem; height: 4rem;" src="{{ reply.image.url }}">
+            </div>
+            {% endif %}
+        </div>
+        <div class="media-body">
+            <div class="media-heading">#{{ reply.id }}</div>
+            <div class="media-content">{{ reply.content }}</div>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="grid -between">
+        <div class="cell" style="width: 50%">
+            <form action="{% url "boards:thread-reply" thread.board.slug thread.pk %}">
+                <button type="submit" class="btn btn-success">Reply</button>
+            </form>
+        </div>
+        <div class="cell" style="width: 50%">
+            <form action="{% url "boards:board-detail" thread.board.slug %}">
+                <button type="submit" class="btn btn-primary">Back to Board Catalog</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

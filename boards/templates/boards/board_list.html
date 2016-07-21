@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    {% for board in board_list %}
+    <a href="{% url "boards:board-detail" board.slug %}">{{ board.name }}</a>
+    {% endfor %}
+    {% if request.user.is_authenticated %}
+    <p>Logged in as {{ user }}</p>
+    <a href="{% url 'boards:logout' %}?next={% firstof request.path '/' %}">Logout</a>
+    {% else %}
+    <a href="{% url 'boards:login' %}?next={% firstof request.path '/' %}">Login</a>
+    {% endif %}
+</div>
+{% endblock %}
