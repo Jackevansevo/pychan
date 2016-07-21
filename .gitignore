@@ -1,5 +1,6 @@
 media/*
 *.pyc
+db.sqlite3
 migrations
 venv/*
 __pycache__/*
