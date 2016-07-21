@@ -2,3 +2,4 @@ media/*
 *.pyc
 migrations
 venv/*
+__pycache__/*
