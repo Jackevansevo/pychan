@@ -19,11 +19,6 @@ a { text-decoration: none; !important; }
     align-content: flex-start;
 }
 
-.clas_name { 
-    text-decoration: none;  !important
-    colors: black;
-}
-
 .item {
     width: 300px;
 }
@@ -47,7 +42,7 @@ a { text-decoration: none; !important; }
         <ul class="list thread-container">
             {% for thread in view.get_threads %}
                 <li class="item">
-                    <a class="class_name" href="{% url "boards:thread-detail" thread.board.slug thread.pk %}">
+                    <a href="{{ thread.get_absolute_url }}">
                         <img src="{{ thread.image.url }}" style="max-height: 150px;">
                     </a>
                     <p class="title">{{ thread.title | truncatewords:20 }}</p>
