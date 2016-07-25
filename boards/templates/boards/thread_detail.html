@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% block content %}
 <div class="container">
+    <p style="color: blue;">{{ thread.is_active }}</p>
     <div style="width: 20%">
         <img style="max-width: 150px; max-height: 150px float: left;" src="{{ thread.image.url }}">
         <div style="float-right">
@@ -19,7 +20,8 @@
             {% endif %}
         </div>
         <div class="media-body">
-            <div class="media-heading">#{{ reply.id }}</div>
+            <span class="media-heading">#{{ reply.id }}</span>
+            <span>{{ reply.created_on }}</span>
             <div class="media-content">{{ reply.content }}</div>
         </div>
     </div>
