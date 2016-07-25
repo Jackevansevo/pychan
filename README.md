@@ -20,3 +20,7 @@ An Imageboard clone written in Django. Still very much WIP
     ./manage.py populate && ./manage.py runserver
 
 
+
+## Screenshot
+
+![screenshot](screenshot.png "Screenshot")
