@@ -1,18 +1,36 @@
 from boards.forms import ThreadForm, ReplyForm
-from boards.models import Board, Thread, Reply
+from boards.models import Board, Thread, Reply, Filter
 from django.core.urlresolvers import reverse
-from django.views.generic import ListView, DetailView, CreateView
+from django.db.models import Q
+from django.views.generic import ListView, DetailView, CreateView, View
 
 
-class BoardList(ListView):
+class ShowBoardsMixin(View):
+    def get_boards(self):
+        # To display a list of boards at the top of each view
+        return Board.objects.all()
+
+
+class BoardList(ShowBoardsMixin, ListView):
     model = Board
 
 
-class BoardDetail(DetailView):
+class BoardDetail(ShowBoardsMixin, DetailView):
     model = Board
 
+    def get_threads(self):
+        threads = Thread.objects.filter(board=self.object)
+        if self.request.user.is_authenticated():
+            # Get a list of user defined text filters
+            filter_list = Filter.objects.filter(
+                user=self.request.user).values_list('text', flat=True)
+            # Loop through the filters and filter down the thread queryset
+            for filter_text in filter_list:
+                threads = threads.filter(~Q(title__icontains=filter_text))
+        return threads
 
-class ThreadCreate(CreateView):
+
+class ThreadCreate(ShowBoardsMixin, CreateView):
     model = Thread
     form_class = ThreadForm
     template_name_suffix = "_create_form"
@@ -30,7 +48,7 @@ class ThreadCreate(CreateView):
         return reverse('boards:board-detail', args=[self.board.slug])
 
 
-class ReplyCreate(CreateView):
+class ReplyCreate(ShowBoardsMixin, CreateView):
     model = Reply
     form_class = ReplyForm
     template_name_suffix = "_create_form"
@@ -49,5 +67,5 @@ class ReplyCreate(CreateView):
                                                      self.thread.pk])
 
 
-class ThreadDetail(DetailView):
+class ThreadDetail(ShowBoardsMixin, DetailView):
     model = Thread
