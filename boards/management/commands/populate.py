@@ -1,7 +1,11 @@
-from django.core.management.base import BaseCommand
-from django.core.management import call_command
 from autofixture import AutoFixture
 from boards.models import Board, Thread, Reply
+from django.core.files import File
+from django.core.management import call_command
+from django.core.management.base import BaseCommand
+
+import os
+import random
 
 boards = {
     'g': 'Technology',
@@ -12,14 +16,18 @@ boards = {
     'ck': 'Cooking'
 }
 
-# [TODO] Auto add random images, to Boards / Threads
+# [TODO] Add random images Thread Replies
 # Emulate sample content of actual webpage
 
 
 class Command(BaseCommand):
     """
     Populates the imageboard with fake test data
+
     """
+    def random_image(self):
+        fp = "images/" + random.choice(os.listdir(os.path.abspath("images")))
+        return File(open(fp, 'rb'))
 
     help = 'Populates the database with mock data'
 
@@ -35,9 +43,11 @@ class Command(BaseCommand):
         )
 
         # Randomly generate threads and replies for existing boards
-        thread_fixture = AutoFixture(Thread)
-        reply_fixture = AutoFixture(Reply)
-        thread_fixture.create(10)
-        reply_fixture.create(10)
+        thread_fixture = AutoFixture(
+            Thread, field_values={'image': self.random_image})
+        reply_fixture = AutoFixture(
+            Reply, field_values={'image': self.random_image})
+        thread_fixture.create(100)
+        reply_fixture.create(500)
 
         self.stdout.write(self.style.SUCCESS('Done'))
