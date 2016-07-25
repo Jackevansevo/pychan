@@ -2,16 +2,33 @@
 {% block content %}
 {% load style-forms %}
 <div class="container">
-    <form method="post" enctype="multipart/form-data">
+    <form class="form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
-        <fieldset class="form-group">
-            {{ field.label }}
-            {{ field | addClass:"form-control" }}
-        </fieldset>
+            {% if field.errors %}
+                <fieldset class="form-group form-error">
+                    {{ field.label_tag }}
+                    {{ field | addClass:"form-control" }}
+                    <div class="help-block">
+                        {{ field.errors.as_text }}
+                    </div>
+                </fieldset>
+            {% else %}
+                {% if field.label == "Content" %}
+                    <fieldset class="form-group form-textarea">
+                        {{ field.label_tag }}
+                        {{ field | addClass:"form-control" }}
+                    </fieldset>
+                {% else %}
+                    <fieldset class="form-group">
+                        {{ field.label_tag }}
+                        {{ field | addClass:"form-control" }}
+                    </fieldset>
+                {% endif %}
+            {% endif %}
         {% endfor %}
         <div class="form-actions">
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" class="btn btn-success btn-block">Submit</button>
         </div>
     </form>
 </div>

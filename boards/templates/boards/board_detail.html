@@ -2,11 +2,30 @@
 {% load staticfiles %}
 {% block content %}
 <style type="text/css">
-ul, li {
-    display: block;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+ul, li{
+    list-style-type: none !important;
+    display: inline-block !important;
+}
+
+
+a { text-decoration: none; !important; }
+
+.thread-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.clas_name { 
+    text-decoration: none;  !important
+    colors: black;
+}
+
+.item {
+    width: 300px;
 }
 </style>
 <div class="container">
@@ -15,7 +34,7 @@ ul, li {
         <div class="grid -between">
             <div class="cell">
                 <form action="{% url "boards:create-thread" board.slug %}">
-                    <button type="submit" class="btn">New Thread</button>
+                    <button type="submit" class="btn btn-info">New Thread</button>
                 </form>
             </div>
             <div class="cell">
@@ -25,14 +44,14 @@ ul, li {
                 </fieldset>
             </div>
         </div>
-        <ul class="list" style="list-style-type:none">
-            {% for thread in board.thread_set.all %}
-                <li style-"list-style-type: none;">
-                    <div class="card">
-                        <header class="card-header title"><a href="{% url "boards:thread-detail" thread.board.slug thread.pk %}">{{ thread.title }}</a></header>
+        <ul class="list thread-container">
+            {% for thread in view.get_threads %}
+                <li class="item">
+                    <a class="class_name" href="{% url "boards:thread-detail" thread.board.slug thread.pk %}">
                         <img src="{{ thread.image.url }}" style="max-height: 150px;">
-                        <p class="content">{{ thread.content }}</p>
-                    </div>
+                    </a>
+                    <p class="title">{{ thread.title | truncatewords:20 }}</p>
+                    <p class="content">{{ thread.content | truncatewords:20 }}</p>
                 </li>
             {% endfor %}
         </ul>

@@ -6,10 +6,29 @@
         <title>{% block title %}Pychan{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{% static 'node_modules/hack/dist/hack.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'node_modules/hack/dist/standard.css' %}" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" type="image/png" href="{% static "logo.png" %}"/>
     </head>
-    <body class="hack">
-        {% block content %}
-        {% endblock %}
+    <style type="text/css">
+    .container {
+        max-width: 100% !important;
+    }
+    </style>
+    <body class="standard">
+        <div class="container">
+            {% for board in view.get_boards %}
+                <a href="{% url "boards:board-detail" board.slug %}">{{ board.name }}</a>
+            {% endfor %}
+            {% if request.user.is_authenticated %}
+            <p>Logged in as {{ user }}</p>
+            <a href="{% url 'boards:logout' %}?next={% firstof request.path '/' %}">Logout</a>
+            {% else %}
+            <a href="{% url 'boards:login' %}?next={% firstof request.path '/' %}">Login</a>
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
     </body>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
     {% block scripts %}
