@@ -17,7 +17,7 @@
     <body class="standard">
         <div class="container">
             {% for board in view.get_boards %}
-                <a href="{% url "boards:board-detail" board.slug %}">{{ board.name }}</a>
+                <a href="{{ board.get_absolute_url }}"> {{ board.name }}</a>
             {% endfor %}
             {% if request.user.is_authenticated %}
             <p>Logged in as {{ user }}</p>
