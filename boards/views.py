@@ -2,6 +2,7 @@ from boards.forms import ThreadForm, ReplyForm
 from boards.models import Board, Thread, Reply, Filter
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.http import HttpResponseNotFound
 from django.views.generic import ListView, DetailView, CreateView, View
 
 
@@ -69,3 +70,15 @@ class ReplyCreate(ShowBoardsMixin, CreateView):
 
 class ThreadDetail(ShowBoardsMixin, DetailView):
     model = Thread
+
+    def get_object(self):
+        # Cache the objec in order to check it at dispatch
+        if not hasattr(self, '_object'):
+            self._object = super(ThreadDetail, self).get_object()
+        return self._object
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the thread has 404'd or not
+        if self.get_object().has_404d:
+            return HttpResponseNotFound('<h1>Thread has 404d</h1>')
+        return super(ThreadDetail, self).dispatch(request, *args, **kwargs)
