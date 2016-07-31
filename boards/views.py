@@ -1,9 +1,11 @@
 from boards.forms import ThreadForm, ReplyForm
 from boards.models import Board, Thread, Reply, Filter
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 from django.http import HttpResponseNotFound
 from django.views.generic import ListView, DetailView, CreateView, View
+
+# [TODO] Be consistent with kwargs and args in get_absolute_url()
+# [TODO] Save colour scheme in session cookie, then load in base.html
 
 
 class ShowBoardsMixin(View):
@@ -20,14 +22,14 @@ class BoardDetail(ShowBoardsMixin, DetailView):
     model = Board
 
     def get_threads(self):
-        threads = Thread.objects.filter(board=self.object)
+        threads = Thread.active_threads.filter(board=self.object)
         if self.request.user.is_authenticated():
             # Get a list of user defined text filters
             filter_list = Filter.objects.filter(
                 user=self.request.user).values_list('text', flat=True)
-            # Loop through the filters and filter down the thread queryset
+            # Loop through user filters and exclude matching threads
             for filter_text in filter_list:
-                threads = threads.filter(~Q(title__icontains=filter_text))
+                threads = threads.exclude(title__icontains=filter_text)
         return threads
 
 
@@ -56,6 +58,8 @@ class ReplyCreate(ShowBoardsMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.thread = Thread.objects.get(pk=self.kwargs['pk'])
+        if self.thread.has_404d:
+            return HttpResponseNotFound('<h1>Thread has 404d</h1>')
         return super(ReplyCreate, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -72,7 +76,7 @@ class ThreadDetail(ShowBoardsMixin, DetailView):
     model = Thread
 
     def get_object(self):
-        # Cache the objec in order to check it at dispatch
+        # Cache the object in order to check it at dispatch
         if not hasattr(self, '_object'):
             self._object = super(ThreadDetail, self).get_object()
         return self._object

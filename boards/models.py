@@ -7,13 +7,12 @@ from django.utils.functional import cached_property
 # [TODO]
 # Order threads by bump count
 # Prevent submitting images to threads that have 404'd
-# Save User Filters in DB, also have filters tied to a session
 # Implement thread bump count functionality
 # Limit number of POST requests from certain IP Addresses / Sessions
 # look at https://github.com/jsocol/django-ratelimit
 
-# Add bots which emulate behaviour of image board, web scraping project, +
-# maybe a super simple neural network that attempts to learn an average comment
+# Look into using Celery to auto expire threads in the background, instead of
+# running checks
 
 
 class TimeStampedModel(models.Model):
@@ -46,11 +45,22 @@ class Board(models.Model):
         return self.name
 
 
+class ActiveThreadManager(models.Manager):
+    def get_queryset(self):
+        # [TODO] Figure out a way of checking against has 404d instead of
+        # expired field
+        return super(ActiveThreadManager,
+                     self).get_queryset().exclude(expired=True)
+
+
 class Thread(TimeStampedModel):
     title = models.CharField(max_length=120)
     content = models.TextField(max_length=30000)
     image = models.ImageField(upload_to='images/%Y/%m/%d')
-    board = models.ForeignKey(Board)
+    board = models.ForeignKey(Board, related_name="threads")
+    expired = models.BooleanField(default=False, blank=True)
+    objects = models.Manager()  # The default manager.
+    active_threads = ActiveThreadManager()  # Manager for active threads
 
     class Meta:
         # [TODO] Order by bump count
@@ -69,7 +79,6 @@ class Thread(TimeStampedModel):
             return True
         return False
 
-    @cached_property
     def is_active(self):
         # Returns True if Thread has had a reply in the last 5 minutes
         latest_reply = Reply.objects.all().filter(thread=self).last()
@@ -98,6 +107,15 @@ class Reply(TimeStampedModel):
     content = models.TextField(max_length=30000)
     image = models.ImageField(upload_to='images/%Y/%m/%d', null=True,
                               blank=True)
+
+    def save(self, *args, **kwargs):
+        # Save the reply
+        super(Reply, self).save(*args, **kwargs)
+        # [TODO] Do this check using Celery
+        # Check if the thread has now expired
+        if self.thread.has_404d:
+            self.thread.expired = True
+            self.thread.save(update_fields=["expired"])
 
     def __str__(self):
         return self.content

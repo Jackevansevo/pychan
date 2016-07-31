@@ -2,12 +2,28 @@
 {% load staticfiles %}
 {% block content %}
 <div class="container">
-    <p style="color: blue;">{{ thread.is_active }}</p>
-    <div style="width: 20%">
-        <img style="max-width: 150px; max-height: 150px float: left;" src="{{ thread.image.url }}">
-        <div style="float-right">
-            <p>{{ thread.title }}</p>
-            <p>{{ thread.content }}</p>
+    <div class="grid -between">
+        <div class="cell" style="margin: 2em;">
+            <form action="{% url "boards:thread-reply" thread.board.slug thread.pk %}" style="display: inline">
+                <button type="submit" class="btn btn-success">Reply</button>
+            </form>
+            <form action="{% url "boards:board-detail" thread.board.slug %}" style="display: inline">
+                <button type="submit" class="btn btn-primary">Back to Board Catalog</button>
+            </form>
+        </div>
+    </div>
+    <div class="media" style="background-color: #eee">
+        <div class="media-left">
+            {% if thread.image %}
+            <div class="avatarholder">
+                <img style="max-width: 4rem; height: 4rem;" src="{{ thread.image.url }}">
+            </div>
+            {% endif %}
+        </div>
+        <div class="media-body">
+            <span class="media-heading">#{{ thread.id }}</span>
+            <span>{{ thread.created_on }}</span>
+            <div class="media-content">{{ thread.content }}</div>
         </div>
     </div>
     {% for reply in thread.reply_set.all %}
@@ -15,7 +31,7 @@
         <div class="media-left">
             {% if reply.image %}
             <div class="avatarholder">
-                    <img style="width: 4rem; height: 4rem;" src="{{ reply.image.url }}">
+                <img style="width: 4rem; height: 4rem;" src="{{ reply.image.url }}">
             </div>
             {% endif %}
         </div>
@@ -26,17 +42,5 @@
         </div>
     </div>
     {% endfor %}
-    <div class="grid -between">
-        <div class="cell" style="width: 50%">
-            <form action="{% url "boards:thread-reply" thread.board.slug thread.pk %}">
-                <button type="submit" class="btn btn-success">Reply</button>
-            </form>
-        </div>
-        <div class="cell" style="width: 50%">
-            <form action="{% url "boards:board-detail" thread.board.slug %}">
-                <button type="submit" class="btn btn-primary">Back to Board Catalog</button>
-            </form>
-        </div>
-    </div>
 </div>
 {% endblock %}
