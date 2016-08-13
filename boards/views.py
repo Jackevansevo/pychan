@@ -1,6 +1,7 @@
 from boards.forms import ThreadForm, ReplyForm
 from boards.models import Board, Thread, Reply, Filter
 from django.core.urlresolvers import reverse
+from django.db.models import Count
 from django.http import HttpResponseNotFound
 from django.views.generic import ListView, DetailView, CreateView, View
 
@@ -22,7 +23,8 @@ class BoardDetail(ShowBoardsMixin, DetailView):
     model = Board
 
     def get_threads(self):
-        threads = Thread.active_threads.filter(board=self.object)
+        threads = self.object.threads.exclude(expired=True)\
+            .annotate(reply_count=Count('replies')).order_by('-reply_count')
         if self.request.user.is_authenticated():
             # Get a list of user defined text filters
             filter_list = Filter.objects.filter(
@@ -58,7 +60,7 @@ class ReplyCreate(ShowBoardsMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.thread = Thread.objects.get(pk=self.kwargs['pk'])
-        if self.thread.has_404d:
+        if self.thread.expired:
             return HttpResponseNotFound('<h1>Thread has 404d</h1>')
         return super(ReplyCreate, self).dispatch(request, *args, **kwargs)
 
@@ -83,6 +85,6 @@ class ThreadDetail(ShowBoardsMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         # Check if the thread has 404'd or not
-        if self.get_object().has_404d:
+        if self.get_object().expired:
             return HttpResponseNotFound('<h1>Thread has 404d</h1>')
         return super(ThreadDetail, self).dispatch(request, *args, **kwargs)

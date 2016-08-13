@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
+{{ thread.bump_count }}
 <div class="container">
     <div class="grid -between">
         <div class="cell" style="margin: 2em;">
@@ -26,7 +27,7 @@
             <div class="media-content">{{ thread.content }}</div>
         </div>
     </div>
-    {% for reply in thread.reply_set.all %}
+    {% for reply in thread.replies.all %}
     <div class="media">
         <div class="media-left">
             {% if reply.image %}

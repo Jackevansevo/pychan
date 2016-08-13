@@ -6,13 +6,10 @@ from django.utils.functional import cached_property
 
 # [TODO]
 # Order threads by bump count
-# Prevent submitting images to threads that have 404'd
-# Implement thread bump count functionality
-# Limit number of POST requests from certain IP Addresses / Sessions
+# Repost timer, prevent save user posting multiple in timeframe
 # look at https://github.com/jsocol/django-ratelimit
-
-# Look into using Celery to auto expire threads in the background, instead of
-# running checks
+# Make Celery task to reduce bump count every minute if thread has had no
+# replies
 
 
 class TimeStampedModel(models.Model):
@@ -36,6 +33,8 @@ class Board(models.Model):
     name = models.CharField(max_length=15)
     short_name = models.CharField(max_length=3)
     slug = AutoSlugField(populate_from='short_name')
+    bump_limit = models.IntegerField(default=100)
+    reply_limit = models.IntegerField(default=5)
 
     @cached_property
     def get_absolute_url(self):
@@ -45,49 +44,19 @@ class Board(models.Model):
         return self.name
 
 
-class ActiveThreadManager(models.Manager):
-    def get_queryset(self):
-        # [TODO] Figure out a way of checking against has 404d instead of
-        # expired field
-        return super(ActiveThreadManager,
-                     self).get_queryset().exclude(expired=True)
-
-
 class Thread(TimeStampedModel):
     title = models.CharField(max_length=120)
     content = models.TextField(max_length=30000)
     image = models.ImageField(upload_to='images/%Y/%m/%d')
     board = models.ForeignKey(Board, related_name="threads")
+    bump_count = models.IntegerField(default=0)
     expired = models.BooleanField(default=False, blank=True)
-    objects = models.Manager()  # The default manager.
-    active_threads = ActiveThreadManager()  # Manager for active threads
-
-    class Meta:
-        # [TODO] Order by bump count
-        ordering = ['-created_on']
-
-    @cached_property
-    def bump_count(self):
-        # Returns the bump count of the Thread, placeholder for now
-        pass
 
     @cached_property
     def hit_reply_limit(self):
         # Returns True if Thread has passed it's reply limit
-        replies = Reply.objects.all().filter(thread=self).count()
-        if replies > 5:
-            return True
-        return False
-
-    def is_active(self):
-        # Returns True if Thread has had a reply in the last 5 minutes
-        latest_reply = Reply.objects.all().filter(thread=self).last()
-        return latest_reply.created_on
-
-    @cached_property
-    def has_404d(self):
-        # Returns True if Thread has 404'd
-        if self.hit_reply_limit:
+        replies = Reply.objects.filter(thread=self).count()
+        if replies > self.board.reply_limit:
             return True
         return False
 
@@ -103,17 +72,16 @@ class Thread(TimeStampedModel):
 class Reply(TimeStampedModel):
     replies = models.ManyToManyField("self", blank=True)
     user = models.ForeignKey(User, blank=True, null=True)
-    thread = models.ForeignKey(Thread)
+    thread = models.ForeignKey(Thread, related_name='replies')
     content = models.TextField(max_length=30000)
     image = models.ImageField(upload_to='images/%Y/%m/%d', null=True,
                               blank=True)
 
     def save(self, *args, **kwargs):
-        # Save the reply
+        self.thread.bump_count += 1
+        self.thread.save(update_fields=['bump_count'])
         super(Reply, self).save(*args, **kwargs)
-        # [TODO] Do this check using Celery
-        # Check if the thread has now expired
-        if self.thread.has_404d:
+        if self.thread.hit_reply_limit:
             self.thread.expired = True
             self.thread.save(update_fields=["expired"])
 
