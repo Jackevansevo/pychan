@@ -1,4 +1,4 @@
-from boards.forms import ThreadForm, ReplyForm
+from boards.forms import ThreadCreateForm, ReplyForm
 from boards.models import Board, Thread, Reply, Filter
 from django.core.urlresolvers import reverse
 from django.db.models import Count
@@ -37,7 +37,7 @@ class BoardDetail(ShowBoardsMixin, DetailView):
 
 class ThreadCreate(ShowBoardsMixin, CreateView):
     model = Thread
-    form_class = ThreadForm
+    form_class = ThreadCreateForm
     template_name_suffix = "_create_form"
 
     def dispatch(self, request, *args, **kwargs):
