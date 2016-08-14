@@ -12,6 +12,17 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 
+BROKER_URL = 'amqp://'
+CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/London'
+
+CELERY_IMPORTS = (
+    'boards.tasks',
+)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
