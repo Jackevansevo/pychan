@@ -3,10 +3,10 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 
 
-class ThreadForm(ModelForm):
+class ThreadCreateForm(ModelForm):
     class Meta:
         model = Thread
-        exclude = ['board']
+        exclude = ['board', 'bump_count', 'expired']
 
     def clean_image(self):
         image = self.cleaned_data.get('image', False)
