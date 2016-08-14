@@ -81,9 +81,6 @@ class Reply(TimeStampedModel):
         self.thread.bump_count += 1
         self.thread.save(update_fields=['bump_count'])
         super(Reply, self).save(*args, **kwargs)
-        if self.thread.hit_reply_limit:
-            self.thread.expired = True
-            self.thread.save(update_fields=["expired"])
 
     def __str__(self):
         return self.content
