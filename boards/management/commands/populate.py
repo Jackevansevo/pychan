@@ -1,3 +1,4 @@
+from autofixture.generators import LoremWordGenerator, LoremSentenceGenerator
 from autofixture import AutoFixture
 from boards.models import Board, Thread, Reply
 from django.core.files import File
@@ -8,12 +9,12 @@ import os
 import random
 
 boards = {
-    'g': 'Technology',
     'b': 'Random',
+    'ck': 'Cooking',
+    'fit': 'Fitness',
+    'g': 'Technology',
     'mu': 'Music',
     'v': 'Games',
-    'fit': 'Fitness',
-    'ck': 'Cooking'
 }
 
 # [TODO] Add random images Thread Replies
@@ -25,8 +26,9 @@ class Command(BaseCommand):
     Populates the imageboard with fake test data
 
     """
-    def random_image(self):
-        fp = "images/" + random.choice(os.listdir(os.path.abspath("images")))
+    def reaction_image(self):
+        dir_path = "images/Reactions/"
+        fp = dir_path + random.choice(os.listdir(os.path.abspath(dir_path)))
         return File(open(fp, 'rb'))
 
     help = 'Populates the database with mock data'
@@ -37,17 +39,31 @@ class Command(BaseCommand):
         # Flush the Database of old data, suppress prompt
         call_command('flush', '--noinput')
 
-        # Create a Board instance each item in the boards dictionary
-        Board.objects.bulk_create(
-            Board(name=val, short_name=key) for key, val in boards.items()
-        )
+        for key, val in boards.items():
+            # Create a board
+            board = Board.objects.create(name=val, short_name=key)
+            board.save()
 
-        # Randomly generate threads and replies for existing boards
-        thread_fixture = AutoFixture(
-            Thread, field_values={'image': self.random_image})
+            # Load some random sample images
+            dir_path = "images/" + str(board) + "/"
+            images = os.listdir(os.path.abspath(dir_path))
+            random.shuffle(images)
+
+            titles = LoremWordGenerator(100)().split()
+            contents = [LoremSentenceGenerator()() for i in range(100)]
+
+            Thread.objects.bulk_create(
+                Thread(
+                    title=title,
+                    content=content,
+                    board=board,
+                    image=File(open(dir_path + img, 'rb'))
+                )
+                for img, title, content in zip(images[:100], titles, contents)
+            )
+
         reply_fixture = AutoFixture(
-            Reply, field_values={'image': self.random_image})
-        thread_fixture.create(100)
-        reply_fixture.create(500)
+            Reply, field_values={'image': self.reaction_image})
+        reply_fixture.create(1000)
 
         self.stdout.write(self.style.SUCCESS('Done'))
