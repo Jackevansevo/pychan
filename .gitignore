@@ -5,3 +5,4 @@ migrations
 tags
 venv/*
 __pycache__/*
+images/*
