@@ -2,27 +2,35 @@
 {% load style-forms %}
 {% block content %}
 {% load style-forms %}
-<form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-        {% if field.errors %}
-            <fieldset class="form-group form-error">
-                {{ field.label_tag }}
-                {{ field | addClass:"form-control" }}
-                <div class="help-block">
-                    {{ field.errors.as_text }}
+<div class="columns is-mobile">
+    <div class="column">
+        <section class="hero is-medium is-primary is-bold">
+            <div class="hero-body">
+                <div class="container">
+                        <div class="columns is-mobile">
+                            <div class="column is-half is-offset-one-quarter">
+                                <h1 class="title">Login</h1>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <p class="control has-icon">
+                                    <input class="input" type="text" name="username" placeholder="Username">
+                                    <i class="fa fa-envelope"></i>
+                                    </p>
+                                    <p class="control has-icon">
+                                    <input class="input" type="password" name="password" placeholder="Password">
+                                    <i class="fa fa-lock"></i>
+                                    </p>
+                                    <p class="control">
+                                    <button class="button is-success" type="submit">
+                                        Login
+                                    </button>
+                                    </p>
+                                </form>
+                            </div>
+                        </div>
                 </div>
-            </fieldset>
-        {% else %}
-            <fieldset class="form-group">
-                {{ field.label_tag }}
-                {{ field | addClass:"form-control" }}
-            </fieldset>
-        {% endif %}
-    {% endfor %}
-    <div class="form-actions">
-        <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+        </section>
     </div>
-</form>
-<p style="color: #f44336;">{{ form.non_field_errors.as_text }}</p>
-{% endblock %}
+</div>
+{% endblock content %}

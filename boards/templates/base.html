@@ -5,36 +5,49 @@
         <meta charset="UTF-8"> 
         <title>{% block title %}Pychan{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="{% static 'node_modules/hack/dist/hack.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'node_modules/hack/dist/dark.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'node_modules/hack/dist/standard.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'node_modules/bulma/css/bulma.css' %}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
         <link rel="shortcut icon" type="image/png" href="{% static "logo.png" %}"/>
     </head>
     <style type="text/css">
-    .container {
-        max-width: 100% !important;
-    }
     </style>
-    <body class="standard">
-        <div class="container">
-            {% for board in view.get_boards %}
-                <a href="{{ board.get_absolute_url }}"> {{ board.name }}</a>
-            {% endfor %}
-
-            <div style="float: right; display: inline;">
-                {% if request.user.is_authenticated %}
-                <span>Logged in as {{ user }}</span>
-                <a href="{% url 'boards:logout' %}?next={% firstof request.path '/' %}">Logout</a>
-                {% else %}
-                <a href="{% url 'boards:login' %}?next={% firstof request.path '/' %}">Login</a>
-                {% endif %}
+    <body>
+        <nav class="nav has-shadow">
+            <div class="container is-fluid">
+                <div class="nav-left">
+                    {% for board in view.get_boards %}
+                    <a class="nav-item is-tab"href="{{ board.get_absolute_url }}"> {{ board.name }}</a>
+                    {% endfor %}
+                </div>
+                <div class="nav-center">
+                    <a class="nav-item is-brand" href="#">
+                        <h1 class="title">{% block navheading %} {% endblock navheading %}</h1>
+                    </a>
+                </div>
+                <div class="nav-right">
+                    {% if request.user.is_authenticated %}
+                    <span class="nav-item">Logged in as {{ user }}</span>
+                    <a class="nav-item is-tab" href="{% url 'boards:logout' %}?next={% firstof request.path '/' %}">Logout</a>
+                    {% else %}
+                    <a class="nav-item is-tab" href="{% url 'boards:login' %}?next={% firstof request.path '/' %}">Login</a>
+                    {% endif %}
+                </div>
             </div>
-
-            {% block content %}
-            {% endblock %}
+        </nav>
+        <div class="container is-fluid">
+            {% block content %} 
+            {% endblock content %}
         </div>
+        <footer class="footer">
+            <div class="container">
+                <div class="content has-text-centered">
+                    <p><strong>PyChan</strong> by <a href="https://jackevansevo.github.io/">Jack Evans</a></p>
+                    <p><a class="icon" href="https://github.com/Jackevansevo"><i class="fa fa-github"></i></a></p>
+                </div>
+            </div>
+        </footer>
     </body>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
     {% block scripts %}
-    {% endblock %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
+    {% endblock scripts %}
 </html>

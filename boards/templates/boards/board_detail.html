@@ -1,80 +1,35 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
-<style type="text/css">
-
-.thread-container, .thread {
-    display: inline-block !important;
-    list-style-type: none !important;
-}
-
-.thread-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    align-content: flex-start;
-}
-
-.thumb {
-    display: block;
-    margin: auto;
-    z-index: 2;
-    min-height: 50px;
-    min-width: 50px;
-    max-width: 200px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.25);
-}
-
-.thread {
-    width: 180px;
-    max-height: 320px;
-    vertical-align: top;
-    overflow: hidden;
-    margin-top: 5px;
-    margin-bottom: 20px;
-    padding: 5px 0 3px 0;
-}
-
-</style>
-<h1>{{ board.name }} Board</h1>
-<div id="users">
-    <div class="grid -between">
-        <div class="cell">
-            <form action="{% url "boards:create-thread" board.slug %}" style="display: inline">
-                <button type="submit" class="btn btn-info">New Thread</button>
-            </form>
-            <button class="btn btn-default" onclick="toggleTheme()">Dark Theme</button>
+{% block navheading %}
+{{ board.name }} Board
+{% endblock navheading %}
+<div id="users" class="columns is-gapless is-multiline is-mobile">
+    {% for thread in view.get_threads %}
+    <div class="card">
+        <div class="card-image">
+            <a href="{{ thread.get_absolute_url }}">
+                <figure class="image is-square">
+                    <img class="thumb" src="{{ thread.image.url }}">
+                </figure>
+            </a>
         </div>
-        <div class="cell">
-            <fieldset class="form-group">
-                <label>Search:</label>
-                <input type="text" placeholder="Search query" class="form-control search" autocomplete="off">
-            </fieldset>
+        <div class="card-content">
+            <div class="media">
+                <div class="media-content">
+                    <p class="title is-5">{{ thread.title | truncatewords:10 }}</p>
+                </div>
+            </div>
+            <div class="content">
+                {{ thread.content | truncatewords:20 }}
+            </div>
         </div>
     </div>
-    <ul class="list thread-container">
-        {% for thread in view.get_threads %}
-        <li class="thread">
-            <a href="{{ thread.get_absolute_url }}">
-                <img class="thumb" src="{{ thread.image.url }}">
-            </a>
-            <p class="title">{{ thread.title | truncatewords:20 }}</p>
-            <p class="content">{{ thread.content | truncatewords:20 }}</p>
-        </li>
-        {% endfor %}
-    </ul>
+    {% endfor %}
 </div>
-<hr>
-
-{% endblock %}
+{% endblock content %}
 {% block scripts %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.2.0/list.min.js"></script>
-<script src="{% static 'board_filter.js' %}"></script>
-<script>
-function toggleTheme() {
-    document.getElementsByTagName('body')[0].className+=' dark'
-}
-</script>
-{% endblock %}
+    {{ block.super }}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.2.0/list.min.js"></script>
+    <script src="{% static 'board_filter.js' %}"></script>
+{% endblock scripts %}
