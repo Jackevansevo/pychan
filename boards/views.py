@@ -1,9 +1,8 @@
 from boards.forms import ThreadCreateForm, ReplyForm
-from boards.models import Board, Thread, Reply, Filter
+from boards.models import Board, Thread
 from django.core.urlresolvers import reverse
-from django.db.models import Count
-from django.http import HttpResponseNotFound
-from django.views.generic import ListView, DetailView, CreateView, View
+from django.views.generic import ListView, DetailView, View, FormView
+from django.views.generic.detail import SingleObjectMixin
 
 # [TODO] Be consistent with kwargs and args in get_absolute_url()
 # [TODO] Save colour scheme in session cookie, then load in base.html
@@ -19,72 +18,93 @@ class BoardList(ShowBoardsMixin, ListView):
     model = Board
 
 
-class BoardDetail(ShowBoardsMixin, DetailView):
+class BoardDisplay(ShowBoardsMixin, DetailView):
     model = Board
 
-    def get_threads(self):
-        threads = self.object.threads.exclude(expired=True)\
-            .annotate(reply_count=Count('replies')).order_by('-reply_count')
+    def get_context_data(self, **kwargs):
+        context = super(BoardDisplay, self).get_context_data(**kwargs)
+        context['form'] = ThreadCreateForm()
+        user_filters = None
         if self.request.user.is_authenticated():
-            # Get a list of user defined text filters
-            filter_list = Filter.objects.filter(
-                user=self.request.user).values_list('text', flat=True)
-            # Loop through user filters and exclude matching threads
-            for filter_text in filter_list:
-                threads = threads.exclude(title__icontains=filter_text)
-        return threads
+            user_filters = self.request.user.filters
+        context['threads'] = self.object.get_threads(filters=user_filters)
+        return context
 
 
-class ThreadCreate(ShowBoardsMixin, CreateView):
-    model = Thread
+class ThreadCreate(SingleObjectMixin, FormView):
+    template_name = 'boards/board_detail.html'
     form_class = ThreadCreateForm
-    template_name_suffix = "_create_form"
+    model = Board
 
-    def dispatch(self, request, *args, **kwargs):
-        self.board = Board.objects.get(slug=self.kwargs['slug'])
-        return super(ThreadCreate, self).dispatch(request, *args, **kwargs)
+    # [TODO] Stick this in a super class, from which both Thread views inherit
+    def get_context_data(self, **kwargs):
+        context = super(ThreadCreate, self).get_context_data(**kwargs)
+        user_filters = None
+        if self.request.user.is_authenticated():
+            user_filters = self.request.user.filters
+        context['threads'] = self.object.get_threads(filters=user_filters)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = Board.objects.get(slug=self.kwargs['slug'])
+        return super(ThreadCreate, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        obj.board = self.board
+        obj.board = self.object
+        obj.save()
         return super(ThreadCreate, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('boards:board-detail', args=[self.board.slug])
+        return self.object.get_absolute_url
 
 
-class ReplyCreate(ShowBoardsMixin, CreateView):
-    model = Reply
-    form_class = ReplyForm
-    template_name_suffix = "_create_form"
+class BoardDetail(View):
 
-    def dispatch(self, request, *args, **kwargs):
-        self.thread = Thread.objects.get(pk=self.kwargs['pk'])
-        if self.thread.expired:
-            return HttpResponseNotFound('<h1>Thread has 404d</h1>')
-        return super(ReplyCreate, self).dispatch(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        view = BoardDisplay.as_view()
+        return view(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.thread = self.thread
-        return super(ReplyCreate, self).form_valid(form)
-
-    def get_success_url(self):
-        return reverse('boards:thread-detail', args=[self.thread.board.slug,
-                                                     self.thread.pk])
+    def post(self, request, *args, **kwargs):
+        view = ThreadCreate.as_view()
+        return view(request, *args, **kwargs)
 
 
-class ThreadDetail(ShowBoardsMixin, DetailView):
+class ThreadDisplay(ShowBoardsMixin, DetailView):
     model = Thread
 
-    def get_object(self):
-        # Cache the object in order to check it at dispatch
-        if not hasattr(self, '_object'):
-            self._object = super(ThreadDetail, self).get_object()
-        return self._object
+    def get_context_data(self, **kwargs):
+        context = super(ThreadDisplay, self).get_context_data(**kwargs)
+        context['form'] = ReplyForm()
+        return context
 
-    def dispatch(self, request, *args, **kwargs):
-        # Check if the thread has 404'd or not
-        if self.get_object().expired:
-            return HttpResponseNotFound('<h1>Thread has 404d</h1>')
-        return super(ThreadDetail, self).dispatch(request, *args, **kwargs)
+
+class ReplyToThread(SingleObjectMixin, FormView):
+    template_name = 'boards/thread_detail.html'
+    form_class = ReplyForm
+    model = Thread
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(ReplyToThread, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        reply = form.save(commit=False)
+        reply.thread = self.object
+        reply.save()
+        return super(ReplyToThread, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('boards:thread-detail', args=[self.object.board.slug,
+                                                     self.object.pk])
+
+
+class ThreadDetail(View):
+
+    def get(self, request, *args, **kwargs):
+        view = ThreadDisplay.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = ReplyToThread.as_view()
+        return view(request, *args, **kwargs)
