@@ -5,7 +5,7 @@
 {{ board.name }} Board
 {% endblock navheading %}
 <div id="users" class="columns is-gapless is-multiline is-mobile">
-    {% for thread in view.get_threads %}
+    {% for thread in threads %}
     <div class="card">
         <div class="card-image">
             <a href="{{ thread.get_absolute_url }}">
@@ -27,9 +27,18 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- [TODO] Move into a modal form -->
+<div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit" />
+    </form>
+</div>
+
+
 {% endblock content %}
 {% block scripts %}
     {{ block.super }}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.2.0/list.min.js"></script>
-    <script src="{% static 'board_filter.js' %}"></script>
 {% endblock scripts %}
