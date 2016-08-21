@@ -1,8 +1,10 @@
-from autoslug import AutoSlugField
-from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.text import slugify
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 # [TODO]
 # Order threads by bump count
@@ -21,20 +23,31 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class Filter(models.Model):
-    user = models.ForeignKey(User)
-    text = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.text
+class Poster(AbstractUser):
+    join_date = models.DateTimeField(auto_now_add=True)
+    filters = ArrayField(models.CharField(max_length=200), blank=True,
+                         default=[])
+    karma = models.PositiveIntegerField(default=0, blank=True)
 
 
 class Board(models.Model):
     name = models.CharField(max_length=15)
     short_name = models.CharField(max_length=3)
-    slug = AutoSlugField(populate_from='short_name')
+    slug = models.SlugField(unique=True)
     bump_limit = models.IntegerField(default=100)
     reply_limit = models.IntegerField(default=5)
+
+    def get_threads(self, filters=None):
+        if filters:
+            regex = r"(" + "|".join(filters) + ")"
+            threads = self.threads.exclude(expired=True, title__iregex=regex)
+        else:
+            threads = self.threads.exclude(expired=True)
+        return threads
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.short_name)
+        super(Board, self).save(*args, **kwargs)
 
     @cached_property
     def get_absolute_url(self):
@@ -71,9 +84,9 @@ class Thread(TimeStampedModel):
 
 class Reply(TimeStampedModel):
     replies = models.ManyToManyField("self", blank=True)
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     thread = models.ForeignKey(Thread, related_name='replies')
-    content = models.TextField(max_length=30000)
+    content = models.TextField(max_length=30000, blank=True, null=True)
     image = models.ImageField(upload_to='images/%Y/%m/%d', null=True,
                               blank=True)
 
