@@ -22,9 +22,3 @@ class ReplyForm(forms.ModelForm):
     class Meta:
         model = Reply
         fields = ['content', 'image']
-
-    def clean(self):
-        # [TODO] Do this check in Javascript, no point sending a get request if
-        # no data has been provided
-        if self.cleaned_data['content'] == '' and self.cleaned_data['image'] is None:
-            raise forms.ValidationError("Please provide some data")
