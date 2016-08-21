@@ -1,13 +1,33 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load widget_tweaks %}
 {% block content %}
+<style type="text/css">
+a.scroll-to-reply {
+	width: 60px;
+	height: 60px;
+    color: white;
+	position: fixed;
+    text-align: center;
+	z-index: 999;
+	right: 20px;
+	bottom: 20px;
+    background: #97cd76;
+	-webkit-border-radius: 30px;
+	-moz-border-radius: 30px;
+	border-radius: 30px;
+}
+</style>
 <div class="container">
+     <a class="scroll-to-reply">
+         <i style="line-height: 60px;" class="fa fa-mail-reply"></i>
+     </a>
     <article class="media">
         <div id="thread-{{ thread.id }}" class="modal">
             <div class="modal-background"></div>
             <div class="modal-content">
                 <p class="image is-4by3">
-                <img src="{{ thread.image.url }}">
+                <img class="modal-image" src="{{ thread.image.url }}">
                 </p>
             </div>
             <button class="modal-close"></button>
@@ -36,7 +56,7 @@
                         <div class="modal-background"></div>
                         <div class="modal-content">
                             <p class="image is-4by3">
-                            <img src="{{ reply.image.url }}">
+                            <img class="modal-image" src="{{ reply.image.url }}">
                             </p>
                         </div>
                         <button class="modal-close"></button>
@@ -55,7 +75,7 @@
                         <strong>#{{ reply.id }}</strong>
                         <small>{{ reply.created_on }}</small>
                         <br>
-                        {{ reply.content }}
+                        <span class="reply">{{ reply.content|urlize }}</span>
                         <br>
                         </p>
                     </div>
@@ -66,26 +86,44 @@
     </article>
     <article class="media">
         <div class="media-content">
-            <p class="control">
-            <textarea class="textarea" placeholder="Add a comment..."></textarea>
-            </p>
-            <p class="control">
-            <button class="button">Post Reply</button>
-            </p>
+            <form id="reply-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <p class="control">
+                {% render_field form.content placeholder="Add a comment..." class+="textarea"  %}
+                </p>
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                    <div class="notification is-danger">
+                        <button class="delete"></button>
+                        <span>{{ error }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                <div id="validation-error" class="notification is-danger" style="display: none;">
+                    <button class="delete" type="button"></button>
+                    <span>Please enter a reply, or provide an image response</span>
+                </div>
+                <p class="control" style="display: inline;">
+                <button id="reply-submit" class="button is-success" type="submit">
+                    Post Reply
+                </button>
+                </p>
+                <p class="control" style="display: inline;">{{ form.image }}</p>
+            </form>
         </div>
     </article>
+    <p style="padding-top: 3rem;">
+        <a class="button is-primary" href="{% url 'boards:board-detail' thread.board.slug %}">
+            <span class="icon">
+                <i class="fa fa-mail-reply"></i>
+            </span>
+            <span>Back to Board Catalog</span>
+        </a>
+    </p>
 </div>
-<form action="{% url "boards:thread-reply" thread.board.slug thread.pk %}" style="display: inline">
-    <button type="submit" class="button">Reply</button>
-</form>
-<form action="{% url "boards:board-detail" thread.board.slug %}" style="display: inline">
-    <button type="submit" class="button">Back to Board Catalog</button>
-</form>
-
-
-{% endblock %}
-
+{% endblock content %}
 {% block scripts %}
-{{ block.super }}
-<script src="{% static 'toggle_modal.js' %}"></script>
+    {{ block.super }}
+    <script src="{% static 'image-gallery.js' %}"></script>
+    <script src="{% static 'form-errors.js' %}"></script>
 {% endblock %}
