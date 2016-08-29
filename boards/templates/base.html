@@ -2,7 +2,7 @@
 {% load staticfiles %}
 <html lang="en">
     <head>
-        <meta charset="UTF-8"> 
+        <meta charset="UTF-8">
         <title>{% block title %}Pychan{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{% static 'node_modules/bulma/css/bulma.css' %}" rel="stylesheet" type="text/css">
@@ -16,26 +16,21 @@
             <div class="container is-fluid">
                 <div class="nav-left">
                     {% for board in view.get_boards %}
-                    <a class="nav-item is-tab"href="{{ board.get_absolute_url }}"> {{ board.name }}</a>
+                        <a class="nav-item is-tab"href="{{ board.get_absolute_url }}"> {{ board.name }}</a>
                     {% endfor %}
-                </div>
-                <div class="nav-center">
-                    <a class="nav-item is-brand" href="#">
-                        <h1 class="title">{% block navheading %} {% endblock navheading %}</h1>
-                    </a>
                 </div>
                 <div class="nav-right">
                     {% if request.user.is_authenticated %}
-                    <span class="nav-item">Logged in as {{ user }}</span>
-                    <a class="nav-item is-tab" href="{% url 'boards:logout' %}?next={% firstof request.path '/' %}">Logout</a>
+                        <span class="nav-item">Logged in as {{ user }}</span>
+                        <a class="nav-item is-tab" href="{% url 'boards:logout' %}?next={% firstof request.path '/' %}">Logout</a>
                     {% else %}
-                    <a class="nav-item is-tab" href="{% url 'boards:login' %}?next={% firstof request.path '/' %}">Login</a>
+                        <a class="nav-item is-tab" href="{% url 'boards:login' %}?next={% firstof request.path '/' %}">Login</a>
                     {% endif %}
                 </div>
             </div>
         </nav>
         <div class="container is-fluid">
-            {% block content %} 
+            {% block content %}
             {% endblock content %}
         </div>
         <footer class="footer">
@@ -48,6 +43,6 @@
         </footer>
     </body>
     {% block scripts %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     {% endblock scripts %}
 </html>

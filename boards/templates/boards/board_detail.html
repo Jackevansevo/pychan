@@ -1,34 +1,33 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% block title %} {{ board.name }} Board {% endblock title %}
 {% block content %}
-{% block navheading %}
-{{ board.name }} Board
-{% endblock navheading %}
+
+
 <div id="users" class="columns is-gapless is-multiline is-mobile">
     {% for thread in threads %}
-    <div class="card">
-        <div class="card-image">
-            <a href="{{ thread.get_absolute_url }}">
-                <figure class="image is-square">
-                    <img class="thumb" src="{{ thread.image.url }}">
-                </figure>
-            </a>
-        </div>
-        <div class="card-content">
-            <div class="media">
-                <div class="media-content">
-                    <p class="title is-5">{{ thread.title | truncatewords:10 }}</p>
+        <div class="card">
+            <div class="card-image">
+                <a href="{{ thread.get_absolute_url }}">
+                    <figure class="image is-square">
+                        <img class="thumb" src="{{ thread.image.url }}">
+                    </figure>
+                </a>
+            </div>
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content">
+                        <p class="title is-5">{{ thread.title | truncatewords:10 }}</p>
+                    </div>
+                </div>
+                <div class="content">
+                    {{ thread.content | truncatewords:20 }}
                 </div>
             </div>
-            <div class="content">
-                {{ thread.content | truncatewords:20 }}
-            </div>
         </div>
-    </div>
     {% endfor %}
 </div>
 
-<!-- [TODO] Move into a modal form -->
 <div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
