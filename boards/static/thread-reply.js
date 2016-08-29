@@ -18,7 +18,6 @@ $('.notification > button').click(function(event) {
 $(window).scroll(function() {
     distanceFromBottom = Math.floor($(document).height() - $(document).scrollTop() - $(window).height());
     if (distanceFromBottom < 300 ) {
-        console.log("memes");
         $('a.scroll-to-reply').fadeOut('slow');
     } else {
         $('a.scroll-to-reply').fadeIn('slow');
