@@ -25,8 +25,11 @@ class TimeStampedModel(models.Model):
 
 class Poster(AbstractUser):
     join_date = models.DateTimeField(auto_now_add=True)
-    filters = ArrayField(models.CharField(max_length=200), blank=True,
-                         default=[])
+    filters = ArrayField(
+        models.CharField(max_length=200),
+        blank=True,
+        default=[]
+    )
     karma = models.PositiveIntegerField(default=0, blank=True)
 
 
@@ -65,6 +68,10 @@ class Thread(TimeStampedModel):
     bump_count = models.IntegerField(default=0)
     expired = models.BooleanField(default=False, blank=True)
 
+    class Meta:
+        # Order threads by bump count, using creation date as a tie breaker
+        ordering = ('-bump_count', '-created_on')
+
     @cached_property
     def hit_reply_limit(self):
         # Returns True if Thread has passed it's reply limit
@@ -75,8 +82,12 @@ class Thread(TimeStampedModel):
 
     @cached_property
     def get_absolute_url(self):
-        return reverse('boards:thread-detail', kwargs={'slug': self.board.slug,
-                                                       'pk': self.id})
+        return reverse(
+            'boards:thread-detail', kwargs={
+                'slug': self.board.slug,
+                'pk': self.id
+            }
+        )
 
     def __str__(self):
         return self.title
@@ -84,11 +95,14 @@ class Thread(TimeStampedModel):
 
 class Reply(TimeStampedModel):
     replies = models.ManyToManyField("self", blank=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     thread = models.ForeignKey(Thread, related_name='replies')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     content = models.TextField(max_length=30000, blank=True, null=True)
-    image = models.ImageField(upload_to='images/%Y/%m/%d', null=True,
-                              blank=True)
+    image = models.ImageField(
+        upload_to='images/%Y/%m/%d',
+        null=True,
+        blank=True
+    )
 
     def save(self, *args, **kwargs):
         self.thread.bump_count += 1

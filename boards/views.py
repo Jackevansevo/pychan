@@ -1,17 +1,18 @@
 from boards.forms import ThreadCreateForm, ReplyForm
 from boards.models import Board, Thread
-from django.core.urlresolvers import reverse
 from django.views.generic import ListView, DetailView, View, FormView
 from django.views.generic.detail import SingleObjectMixin
-
-# [TODO] Be consistent with kwargs and args in get_absolute_url()
-# [TODO] Save colour scheme in session cookie, then load in base.html
 
 
 class ShowBoardsMixin(View):
     def get_boards(self):
         # To display a list of boards at the top of each view
         return Board.objects.all()
+
+
+class FetchURLMixin(FormView):
+    def get_success_url(self):
+        return self.object.get_absolute_url
 
 
 class BoardList(ShowBoardsMixin, ListView):
@@ -31,12 +32,11 @@ class BoardDisplay(ShowBoardsMixin, DetailView):
         return context
 
 
-class ThreadCreate(SingleObjectMixin, FormView):
+class ThreadCreate(SingleObjectMixin, FetchURLMixin):
     template_name = 'boards/board_detail.html'
     form_class = ThreadCreateForm
     model = Board
 
-    # [TODO] Stick this in a super class, from which both Thread views inherit
     def get_context_data(self, **kwargs):
         context = super(ThreadCreate, self).get_context_data(**kwargs)
         user_filters = None
@@ -54,9 +54,6 @@ class ThreadCreate(SingleObjectMixin, FormView):
         obj.board = self.object
         obj.save()
         return super(ThreadCreate, self).form_valid(form)
-
-    def get_success_url(self):
-        return self.object.get_absolute_url
 
 
 class BoardDetail(View):
@@ -79,7 +76,7 @@ class ThreadDisplay(ShowBoardsMixin, DetailView):
         return context
 
 
-class ReplyToThread(SingleObjectMixin, FormView):
+class ReplyToThread(SingleObjectMixin, FetchURLMixin):
     template_name = 'boards/thread_detail.html'
     form_class = ReplyForm
     model = Thread
@@ -93,10 +90,6 @@ class ReplyToThread(SingleObjectMixin, FormView):
         reply.thread = self.object
         reply.save()
         return super(ReplyToThread, self).form_valid(form)
-
-    def get_success_url(self):
-        return reverse('boards:thread-detail', args=[self.object.board.slug,
-                                                     self.object.pk])
 
 
 class ThreadDetail(View):
