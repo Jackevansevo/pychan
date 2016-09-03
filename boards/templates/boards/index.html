@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero is-medium is-primary is-bold">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                Pychan
+            </h1>
+            <h2 class="subtitle">
+                Currently Work in Progress
+            </h2>
+        </div>
+    </div>
+</section>
+
+<section class="section is-medium">
+    <div class="container">
+        <div class="heading">
+            <h1 class="title">Progress:</h1>
+            <h2 class="subtitle" style="padding-bottom: 2rem;">
+                Current Status of the Site is: &nbsp;<strong><i class="fa fa-warning"></i> Complete Disaster</strong>
+            </h2>
+        </div>
+        <progress class="progress is-success is-medium" value="60" max="100">60%</progress>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="heading">
+            <h1 class="title" style="padding-bottom: 2rem;">Site News</h1>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><i class="fa fa-newspaper-o"></i> News</th>
+                    <th><i class="fa fa-calendar"></i> Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modal Forms Added!</td>
+                    <td>29th August 2016</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,43 +1,111 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load widget_tweaks %}
 {% block title %} {{ board.name }} Board {% endblock title %}
 {% block content %}
+<style type="text/css">
+a#thread-create {
+	width: 60px;
+	height: 60px;
+    color: white;
+	position: fixed;
+    text-align: center;
+	z-index: 999;
+	right: 20px;
+	bottom: 20px;
+    background: #97cd76;
+	-webkit-border-radius: 30px;
+	-moz-border-radius: 30px;
+	border-radius: 30px;
+}
+</style>
 
-
-<div id="users" class="columns is-gapless is-multiline is-mobile">
-    {% for thread in threads %}
-        <div class="card">
-            <div class="card-image">
-                <a href="{{ thread.get_absolute_url }}">
-                    <figure class="image is-square">
-                        <img class="thumb" src="{{ thread.image.url }}">
-                    </figure>
-                </a>
-            </div>
-            <div class="card-content">
-                <div class="media">
-                    <div class="media-content">
-                        <p class="title is-5">{{ thread.title | truncatewords:10 }}</p>
+<!-- Thread Cards -->
+<section class="section">
+    <div class="container-fliud">
+        <div id="users" class="columns is-gapless is-multiline is-mobile">
+            {% for thread in threads %}
+            <div class="card">
+                <div class="card-image">
+                    <a href="{{ thread.get_absolute_url }}">
+                        <figure class="image is-square">
+                            <img class="thumb" src="{{ thread.image.url }}">
+                        </figure>
+                    </a>
+                </div>
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-content">
+                            <p class="title is-5">{{ thread.title | truncatewords:10 }}</p>
+                        </div>
+                    </div>
+                    <div class="content">
+                        {{ thread.content | truncatewords:20 }}
                     </div>
                 </div>
-                <div class="content">
-                    {{ thread.content | truncatewords:20 }}
-                </div>
             </div>
+            {% endfor %}
         </div>
-    {% endfor %}
+    </div>
+</section>
+
+<!-- Thread Create Modal Form -->
+<div class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Create a Thread</p>
+            <button class="delete"></button>
+        </header>
+        <form method="post" enctype="multipart/form-data">
+            <section class="modal-card-body">
+                {% csrf_token %}
+                <label class="label">{{ form.title.label }}</label>
+                <p class="control">
+                    {% render_field form.title placeholder="Title" class+="input" %}
+                </p>
+                <label class="label">{{ form.content.label }}</label>
+                <p class="control">
+                    {% render_field form.content placeholder="Add a comment..." class+="textarea" %}
+                </p>
+                {% if form.captcha.errors %}
+                    <p class="control has-icon has-icon-right">
+                        {% render_field form.captcha class+="input is-danger" %}
+                    <i class="fa fa-warning"></i>
+                        {% for error in form.captcha.errors %}
+                            <span class="help is-danger">{{ error }}</span>
+                        {% endfor %}
+                    </p>
+                {% else %}
+                    <p class="control">
+                        {% render_field form.captcha class+="input" %}
+                    </p>
+                {% endif %}
+                {% if form.image.errors %}
+                    {% for error in form.image.errors %}
+                    <div class="notification is-danger">
+                        <span class="modal-error">{{ error }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success" type="submit">
+                    Create Thread
+                </button>
+                {% render_field form.image %}
+            </footer>
+        </form>
+    </div>
 </div>
 
-<div>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Submit" />
-    </form>
-</div>
-
+<!-- Launch Thread Create Modal Button -->
+<a id="thread-create" data-target=".modal">
+    <i style="line-height: 60px;" class="fa fa-plus"></i>
+</a>
 
 {% endblock content %}
 {% block scripts %}
     {{ block.super }}
+    <script src="{% static 'thread-create.js' %}"></script>
 {% endblock scripts %}
