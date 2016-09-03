@@ -5,7 +5,7 @@ from . import views
 
 app_name = "boards"
 urlpatterns = [
-    url(r'^$', views.BoardList.as_view(), name='index'),
+    url(r'^$', views.Index.as_view(), name='index'),
 
     url(r'^(?P<slug>[\w-]+)/catalog$', views.BoardDetail.as_view(),
         name='board-detail'),

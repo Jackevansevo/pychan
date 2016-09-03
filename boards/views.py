@@ -15,7 +15,8 @@ class FetchURLMixin(FormView):
         return self.object.get_absolute_url
 
 
-class BoardList(ShowBoardsMixin, ListView):
+class Index(ShowBoardsMixin, ListView):
+    template_name = 'boards/index.html'
     model = Board
 
 
