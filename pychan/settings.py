@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
+    'captcha',
     'debug_toolbar',
     'django_extensions',
 ]
@@ -124,6 +125,10 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+# Captcha settings
+CAPTCHA_LENGTH = 6
 
 
 # Static files (CSS, JavaScript, Images)
