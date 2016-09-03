@@ -1,9 +1,12 @@
 from django import forms
+from captcha.fields import CaptchaField
 
 from .models import Thread, Reply
 
 
 class ThreadCreateForm(forms.ModelForm):
+    captcha = CaptchaField()
+
     class Meta:
         model = Thread
         exclude = ['board', 'bump_count', 'expired']
@@ -19,6 +22,8 @@ class ThreadCreateForm(forms.ModelForm):
 
 
 class ReplyForm(forms.ModelForm):
+    captcha = CaptchaField()
+
     class Meta:
         model = Reply
         fields = ['content', 'image']
