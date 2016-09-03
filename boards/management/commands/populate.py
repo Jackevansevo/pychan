@@ -17,15 +17,12 @@ boards = {
     'v': 'Games',
 }
 
-# [TODO] Add random images Thread Replies
-# Emulate sample content of actual webpage
-
 
 class Command(BaseCommand):
     """
     Populates the imageboard with fake test data
-
     """
+
     def reaction_image(self):
         dir_path = "images/Reactions/"
         fp = dir_path + random.choice(os.listdir(os.path.abspath(dir_path)))
