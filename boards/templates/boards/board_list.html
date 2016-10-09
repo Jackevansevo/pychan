@@ -1,0 +1,3 @@
+{% for board in boards %}
+<a class="nav-item is-tab" href="{% url 'boards:board-detail' board.slug %}"> {{ board.name }}</a>
+{% endfor %}
