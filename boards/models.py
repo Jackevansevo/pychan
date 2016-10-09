@@ -1,10 +1,11 @@
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.text import slugify
-from django.contrib.auth.models import AbstractUser
-from django.conf import settings
 
 # [TODO]
 # Order threads by bump count
@@ -40,13 +41,13 @@ class Board(models.Model):
     bump_limit = models.IntegerField(default=100)
     reply_limit = models.IntegerField(default=5)
 
-    def get_threads(self, filters=None):
+    def filter_threads(self, filters=None):
         if filters:
-            regex = r"(" + "|".join(filters) + ")"
-            threads = self.threads.exclude(expired=True, title__iregex=regex)
-        else:
-            threads = self.threads.exclude(expired=True)
-        return threads
+            return self.threads.exclude(
+                Q(expired=True) |
+                Q(title__iregex=r'(' + '|'.join(filters) + ')')
+            )
+        return self.threads.exclude(expired=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.short_name)
@@ -103,6 +104,9 @@ class Reply(TimeStampedModel):
         null=True,
         blank=True
     )
+
+    class Meta:
+        ordering = ('created_on',)
 
     def save(self, *args, **kwargs):
         self.thread.bump_count += 1
