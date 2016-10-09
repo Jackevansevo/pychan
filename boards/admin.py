@@ -10,8 +10,11 @@ class PosterAdmin(admin.ModelAdmin):
     list_display = ('join_date', 'filters', 'karma')
 
 
+class ThreadAdmin(admin.ModelAdmin):
+    list_display = ('title', 'bump_count', 'created_on')
+
 # Register your models here.
 admin.site.register(Board, BoardAdmin)
 admin.site.register(Reply)
-admin.site.register(Thread)
+admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Poster, PosterAdmin)
