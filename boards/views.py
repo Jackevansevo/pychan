@@ -16,7 +16,7 @@ def board_detail(request, slug):
             form.instance.board = board
             form.instance.image = form.cleaned_data['image']
             form.instance.save()
-            return HttpResponseRedirect(board)
+            return HttpResponseRedirect(board.get_absolute_url)
     else:
         form = ThreadCreateForm()
     filters = []
