@@ -24,7 +24,7 @@ def board_detail(request, slug):
         filters = request.user.filters
     threads = board.filter_threads(filters)
     context = {'threads': threads, 'form': form}
-    return render(request, 'boards/thread_list.html', context)
+    return render(request, 'boards/board_detail.html', context)
 
 
 def thread_view(request, slug, pk):
