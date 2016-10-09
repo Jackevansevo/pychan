@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% load board_tags %}
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -15,9 +16,7 @@
         <nav class="nav has-shadow">
             <div class="container is-fluid">
                 <div class="nav-left">
-                    {% for board in view.get_boards %}
-                        <a class="nav-item is-tab"href="{{ board.get_absolute_url }}"> {{ board.name }}</a>
-                    {% endfor %}
+                    {% show_boards %}
                 </div>
                 <div class="nav-right">
                     {% if request.user.is_authenticated %}
