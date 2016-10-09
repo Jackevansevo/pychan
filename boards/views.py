@@ -1,104 +1,43 @@
 from boards.forms import ThreadCreateForm, ReplyForm
 from boards.models import Board, Thread
-from django.views.generic import ListView, DetailView, View, FormView
-from django.views.generic.detail import SingleObjectMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 
 
-class ShowBoardsMixin(View):
-    def get_boards(self):
-        # To display a list of boards at the top of each view
-        return Board.objects.all()
+def index(request):
+    return render(request, 'boards/index.html')
 
 
-class FetchURLMixin(FormView):
-    def get_success_url(self):
-        return self.object.get_absolute_url
+def board_detail(request, slug):
+    board = get_object_or_404(Board, slug=slug)
+    if request.method == 'POST':
+        form = ThreadCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Save the thread board and image
+            form.instance.board = board
+            form.instance.image = form.cleaned_data['image']
+            form.instance.save()
+            return HttpResponseRedirect(board)
+    else:
+        form = ThreadCreateForm()
+    filters = []
+    if request.user.is_authenticated:
+        filters = request.user.filters
+    threads = board.filter_threads(filters)
+    context = {'threads': threads, 'form': form}
+    return render(request, 'boards/thread_list.html', context)
 
 
-class Index(ShowBoardsMixin, ListView):
-    template_name = 'boards/index.html'
-    model = Board
-
-
-class BoardDisplay(ShowBoardsMixin, DetailView):
-    model = Board
-
-    def get_context_data(self, **kwargs):
-        context = super(BoardDisplay, self).get_context_data(**kwargs)
-        context['form'] = ThreadCreateForm()
-        user_filters = None
-        if self.request.user.is_authenticated():
-            user_filters = self.request.user.filters
-        context['threads'] = self.object.get_threads(filters=user_filters)
-        return context
-
-
-class ThreadCreate(SingleObjectMixin, FetchURLMixin):
-    template_name = 'boards/board_detail.html'
-    form_class = ThreadCreateForm
-    model = Board
-
-    def get_context_data(self, **kwargs):
-        context = super(ThreadCreate, self).get_context_data(**kwargs)
-        user_filters = None
-        if self.request.user.is_authenticated():
-            user_filters = self.request.user.filters
-        context['threads'] = self.object.get_threads(filters=user_filters)
-        return context
-
-    def post(self, request, *args, **kwargs):
-        self.object = Board.objects.get(slug=self.kwargs['slug'])
-        return super(ThreadCreate, self).post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.board = self.object
-        obj.save()
-        return super(ThreadCreate, self).form_valid(form)
-
-
-class BoardDetail(View):
-
-    def get(self, request, *args, **kwargs):
-        view = BoardDisplay.as_view()
-        return view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        view = ThreadCreate.as_view()
-        return view(request, *args, **kwargs)
-
-
-class ThreadDisplay(ShowBoardsMixin, DetailView):
-    model = Thread
-
-    def get_context_data(self, **kwargs):
-        context = super(ThreadDisplay, self).get_context_data(**kwargs)
-        context['form'] = ReplyForm()
-        return context
-
-
-class ReplyToThread(SingleObjectMixin, FetchURLMixin):
-    template_name = 'boards/thread_detail.html'
-    form_class = ReplyForm
-    model = Thread
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super(ReplyToThread, self).post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        reply = form.save(commit=False)
-        reply.thread = self.object
-        reply.save()
-        return super(ReplyToThread, self).form_valid(form)
-
-
-class ThreadDetail(View):
-
-    def get(self, request, *args, **kwargs):
-        view = ThreadDisplay.as_view()
-        return view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        view = ReplyToThread.as_view()
-        return view(request, *args, **kwargs)
+def thread_view(request, slug, pk):
+    thread = get_object_or_404(Thread, pk=pk)
+    if request.method == 'POST':
+        form = ReplyForm(request.POST)
+        if form.is_valid():
+            # Save the thread board and image
+            form.instance.thread = thread
+            form.instance.save()
+            return HttpResponseRedirect(thread.get_absolute_url)
+    else:
+        form = ReplyForm()
+    context = {'thread': thread, 'form': form}
+    return render(request, 'boards/thread_detail.html', context)
