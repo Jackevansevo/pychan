@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Max
 from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -68,6 +69,15 @@ class Thread(TimeStampedModel):
     board = models.ForeignKey(Board, related_name="threads")
     bump_count = models.IntegerField(default=0)
     expired = models.BooleanField(default=False, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Assigns current max bump_count to new threads, placing them at top
+        if not self.pk:
+            if Thread.objects.all().exists():
+                max_bump = Thread.objects.all().aggregate(
+                    Max('bump_count'))['bump_count__max']
+                self.bump_count = max_bump
+        super(Thread, self).save(*args, **kwargs)
 
     class Meta:
         # Order threads by bump count, using creation date as a tie breaker
