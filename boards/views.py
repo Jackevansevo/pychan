@@ -13,7 +13,6 @@ def board_detail(request, slug):
     if request.method == 'POST':
         form = ThreadCreateForm(request.POST, request.FILES)
         if form.is_valid():
-            # Save the thread board and image
             form.instance.board = board
             form.instance.image = form.cleaned_data['image']
             form.instance.save()
@@ -33,7 +32,6 @@ def thread_view(request, slug, pk):
     if request.method == 'POST':
         form = ReplyForm(request.POST)
         if form.is_valid():
-            # Save the thread board and image
             form.instance.thread = thread
             form.instance.save()
             return HttpResponseRedirect(thread.get_absolute_url)
