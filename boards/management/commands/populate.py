@@ -1,20 +1,16 @@
-from autofixture.generators import LoremWordGenerator, LoremSentenceGenerator
-from autofixture import AutoFixture
-from boards.models import Board, Thread, Reply
 from django.core.files import File
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+
+from boards.fixtures import ThreadFactory, ReplyFactory
+from boards.models import Board
 
 import os
 import random
 
 boards = {
     'b': 'Random',
-    'ck': 'Cooking',
-    'fit': 'Fitness',
     'g': 'Technology',
-    'mu': 'Music',
-    'v': 'Games',
 }
 
 
@@ -41,26 +37,9 @@ class Command(BaseCommand):
             board = Board.objects.create(name=val, short_name=key)
             board.save()
 
-            # Load some random sample images
-            dir_path = "images/" + str(board) + "/"
-            images = os.listdir(os.path.abspath(dir_path))
-            random.shuffle(images)
+            # Create some threads
+            ThreadFactory.create_batch(100, board=board)
 
-            titles = LoremWordGenerator(100)().split()
-            contents = [LoremSentenceGenerator()() for i in range(100)]
-
-            Thread.objects.bulk_create(
-                Thread(
-                    title=title,
-                    content=content,
-                    board=board,
-                    image=File(open(dir_path + img, 'rb'))
-                )
-                for img, title, content in zip(images[:100], titles, contents)
-            )
-
-        reply_fixture = AutoFixture(
-            Reply, field_values={'image': self.reaction_image})
-        reply_fixture.create(1000)
+        ReplyFactory.create_batch(1000)
 
         self.stdout.write(self.style.SUCCESS('Done'))
