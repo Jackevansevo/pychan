@@ -84,7 +84,7 @@ a.scroll-to-reply {
         </article>
         <article class="media">
             <div class="media-content">
-                <form id="reply-form" method="post" enctype="multipart/form-data">
+                <form id="reply-form" action="{% url 'boards:thread-detail' thread.board.slug thread.pk  %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <p class="control">
                     {% render_field form.content placeholder="Add a comment..." class+="textarea"  %}

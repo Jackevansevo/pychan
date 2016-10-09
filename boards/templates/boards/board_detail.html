@@ -54,7 +54,7 @@ a#thread-create {
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p class="modal-card-title">Create a Thread</p>
+            <p class="modal-card-title">Create a Thread </p>
             <button class="delete"></button>
         </header>
         <form method="post" enctype="multipart/form-data">
@@ -73,7 +73,7 @@ a#thread-create {
                         {% render_field form.captcha class+="input is-danger" %}
                     <i class="fa fa-warning"></i>
                         {% for error in form.captcha.errors %}
-                            <span class="help is-danger">{{ error }}</span>
+                            <span class="modal-error help is-danger">{{ error }}</span>
                         {% endfor %}
                     </p>
                 {% else %}
