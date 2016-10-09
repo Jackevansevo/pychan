@@ -22,7 +22,7 @@ def board_detail(request, slug):
     filters = []
     if request.user.is_authenticated:
         filters = request.user.filters
-    threads = board.filter_threads(filters)
+    threads = board.filter_threads(filters)[:50]
     context = {'threads': threads, 'form': form}
     return render(request, 'boards/board_detail.html', context)
 
