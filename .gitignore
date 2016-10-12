@@ -1,8 +1,11 @@
 media/*
 *.pyc
-db.sqlite3
-migrations
-tags
-venv/*
+.coverage
 __pycache__/*
+celerybeat-schedule.db
+celerybeat.pid
+db.sqlite3
 images/*
+staticfiles
+tags*
+venv/*
