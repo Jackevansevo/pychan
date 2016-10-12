@@ -30,6 +30,7 @@ DEBUG = True
 INSTALLED_APPS += [
     'debug_toolbar',
     'django_extensions',
+    'captcha',
 ]
 
 MIDDLEWARE_CLASSES += [
