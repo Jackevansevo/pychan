@@ -225,13 +225,15 @@ INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
 
 # WSGI CONFIGURATION -------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
-WSGI_APPLICATION = 'piesup2.wsgi.application'
+WSGI_APPLICATION = 'pychan.wsgi.application'
 # END WSGI CONFIGURATION ---------------------------------------------------
 
 
 # AUTHENTICATION CONFIGURATION -----------------------------------------------
 # https://docs.djangoproject.com/en/1.10/ref/settings/#logout-redirect-url
 LOGOUT_REDIRECT_URL = '/'
+
+AUTH_USER_MODEL = "boards.Poster"
 
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -249,3 +251,5 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 # END AUTHENTICATION CONFIGURATION --------------------------------------------
+
+
