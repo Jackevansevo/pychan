@@ -7,7 +7,7 @@ class BoardAdmin(admin.ModelAdmin):
 
 
 class PosterAdmin(admin.ModelAdmin):
-    list_display = ('join_date', 'filters', 'karma')
+    list_display = ('username', 'join_date', 'filters', 'karma')
 
 
 class ThreadAdmin(admin.ModelAdmin):
