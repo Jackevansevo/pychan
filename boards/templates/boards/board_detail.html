@@ -3,33 +3,93 @@
 {% load widget_tweaks %}
 {% block title %} {{ board.name }} Board {% endblock title %}
 {% block content %}
-<style type="text/css">
-a#thread-create {
-	width: 60px;
-	height: 60px;
-    color: white;
-	position: fixed;
-    text-align: center;
-	z-index: 999;
-	right: 20px;
-	bottom: 20px;
-    background: #97cd76;
-	-webkit-border-radius: 30px;
-	-moz-border-radius: 30px;
-	border-radius: 30px;
-}
-</style>
 
-<!-- Thread Cards -->
 <section class="section">
-    <div class="container-fliud">
-        {% if threads %}
-            <div id="users" class="columns is-gapless is-multiline is-mobile">
-                {% for thread in threads %}
+    {% if threads %}
+        <div class="columns is-multiline is-mobile">
+            {% for thread in threads %}
+
+                <!-- Thread Delete Modal -->
+                <div class="modal" id="threadDeleteModal{{thread.id}}">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title">Delete Thread</p>
+                            <button class="delete"></button>
+                        </header>
+                        <section class="modal-card-body">
+                            <p><strong>Are you sure you want to delete this thread?</strong></p>
+                            <br>
+                            <div class="box">
+                                <article class="media">
+                                    <div class="media-left">
+                                        <figure class="image is-64x64">
+                                            <img class="thumb" src="{{ thread.image.url }}">
+                                        </figure>
+                                    </div>
+                                    <div class="media-content">
+                                        <div class="content">
+                                            <p>
+                                            <strong>{{ thread.title }}</strong>
+                                            <br>
+                                            {{ thread.content }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                            <p><strong>Reason for deletion?</strong></p>
+                            <br>
+                            <div class="columns is-multiline is-mobile">
+                                <div class="column is-4-desktop">
+                                    <p class="control">
+                                    <label class="checkbox">
+                                        <input type="checkbox">
+                                        Offensive Content
+                                    </label>
+                                    </p>
+                                </div>
+                                <div class="column is-4-desktop">
+                                    <p class="control">
+                                    <label class="checkbox">
+                                        <input type="checkbox">
+                                        Shit post
+                                    </label>
+                                    </p>
+                                </div>
+                                <div class="column is-4-desktop">
+                                    <p class="control">
+                                    <label class="checkbox">
+                                        <input type="checkbox">
+                                        Offtopic discussion
+                                    </label>
+                                    </p>
+                                </div>
+                                <div class="column is-4-desktop">
+                                    <p class="control">
+                                    <label class="checkbox">
+                                        <input type="checkbox">
+                                        Duplicate Thread
+                                    </label>
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                        <footer class="modal-card-foot">
+                            <form method="post" enctype="multipart/form-data" action="{% url "boards:thread-delete" thread.pk %}">
+                                <button type="submit" class="button is-medium is-danger">Delete</button>
+                                <a class="button is-medium cancel">Cancel</a>
+                            </form>
+                        </footer>
+                    </div>
+                </div>
+
+                <!-- Thread Card -->
+                <div class="column is-2-desktop is-4-tablet is-6-mobile">
                     <div class="card">
                         <div class="card-image">
                             <a href="{{ thread.get_absolute_url }}">
-                                <figure class="image is-square">
+                                <figure class="image is-4by3">
                                     <img class="thumb" src="{{ thread.image.url }}">
                                 </figure>
                             </a>
@@ -41,20 +101,31 @@ a#thread-create {
                                 </div>
                             </div>
                             <div class="content">
-                                {{ thread.content | truncatewords:20 }}
+                                {{ thread.content | truncatewords:10 }}
                             </div>
+                            <nav class="level">
+                                <small class="level-left">{{ thread.created_on }}</small>
+                                <div class="level-right">
+                                    <a class="level-item">
+                                        <span class="icon is-small"><i class="fa fa-flag"></i></span>
+                                    </a>
+                                    <a class="level-item show-modal" data-target="#threadDeleteModal{{ thread.id }}">
+                                        <span class="icon is-small"><i class="fa fa-trash"></i></span>
+                                    </a>
+                                </div>
+                            </nav>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <h1 class="title is-3 has-text-centered" style="padding: 7rem;">No Threads Available :(</h1>
-        {% endif %}
-    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <h1 class="title is-3 has-text-centered" style="padding: 7rem;">No Threads Available :(</h1>
+    {% endif %}
 </section>
 
 <!-- Thread Create Modal Form -->
-<div class="modal">
+<div class="modal" id="threadCreateModal">
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
@@ -104,12 +175,12 @@ a#thread-create {
 </div>
 
 <!-- Launch Thread Create Modal Button -->
-<a id="thread-create" data-target=".modal">
+<a class="show-modal floating-button" data-target="#threadCreateModal">
     <i style="line-height: 60px;" class="fa fa-plus"></i>
 </a>
 
 {% endblock content %}
 {% block scripts %}
     {{ block.super }}
-    <script src="{% static 'thread-create.js' %}"></script>
+    <script src="{% static 'modals.js' %}"></script>
 {% endblock scripts %}
