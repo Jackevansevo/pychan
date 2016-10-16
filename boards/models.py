@@ -46,13 +46,19 @@ class Board(models.Model):
         if filters:
             return self.threads.exclude(
                 Q(expired=True) |
-                Q(title__iregex=r'(' + '|'.join(filters) + ')')
+                Q(title__iregex=r'(' + '|'.join(filters) + ')'),
+                Q(content__iregex=r'(' + '|'.join(filters) + ')')
             )
         return self.threads.exclude(expired=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.short_name)
         super(Board, self).save(*args, **kwargs)
+
+    class Meta:
+        permissions = (
+            ("delete_thread", "Can delete board threads"),
+        )
 
     @cached_property
     def get_absolute_url(self):
