@@ -1,0 +1,22 @@
+{
+  "name": "pychan",
+  "version": "1.0.0",
+  "description": "python imageboard",
+  "main": "none",
+  "dependencies": {
+    "bulma": "^0.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "keywords": [
+    "none"
+  ],
+  "author": "Jack Evans",
+  "license": "ISC"
+}
