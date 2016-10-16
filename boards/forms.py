@@ -27,3 +27,15 @@ class ReplyForm(forms.ModelForm):
     class Meta:
         model = Reply
         fields = ['content', 'image']
+
+
+class ThreadDeleteForm(forms.Form):
+    OPTIONS = (
+        ("O", "Offensive Content"),
+        ("S", "Shit Post"),
+        ("T", "Off-topic Discussion"),
+        ("D", "Duplicate Thread"),
+    )
+    reason = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple, choices=OPTIONS
+    )
