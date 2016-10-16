@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.models import Permission
+
 from .models import Board, Reply, Thread, Poster
 
 
@@ -18,3 +20,4 @@ admin.site.register(Board, BoardAdmin)
 admin.site.register(Reply)
 admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Poster, PosterAdmin)
+admin.site.register(Permission)
