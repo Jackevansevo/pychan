@@ -12,6 +12,11 @@ urlpatterns = [
         name='board-detail'
     ),
     url(
+        r'^thread-delete/(?P<pk>[0-9]+)/$',
+        views.thread_delete,
+        name='thread-delete'
+    ),
+    url(
         r'^(?P<slug>[\w-]+)/thread/(?P<pk>[0-9]+)/$',
         views.thread_view,
         name='thread-detail'
