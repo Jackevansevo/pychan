@@ -219,6 +219,10 @@ LOCAL_APPS = [
     'boards.apps.BoardsConfig',
 ]
 
+RECAPTCHA_PUBLIC_KEY = '6LdehgkUAAAAALe6Y9SEQmkAPWQcHGG6Kv0sqDnO'
+RECAPTCHA_PRIVATE_KEY = '6LdehgkUAAAAAIEVMDp9nMuVjrWJJ6Qe3-9bVzK9'
+NOCAPTCHA = True
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
 # END APP CONFIGURATION -------------------------------------------------------
