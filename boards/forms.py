@@ -1,11 +1,11 @@
 from django import forms
-from captcha.fields import CaptchaField
+from captcha.fields import ReCaptchaField
 
 from .models import Thread, Reply
 
 
 class ThreadCreateForm(forms.ModelForm):
-    captcha = CaptchaField()
+    captcha = ReCaptchaField()
 
     class Meta:
         model = Thread
@@ -22,7 +22,7 @@ class ThreadCreateForm(forms.ModelForm):
 
 
 class ReplyForm(forms.ModelForm):
-    captcha = CaptchaField()
+    captcha = ReCaptchaField()
 
     class Meta:
         model = Reply
