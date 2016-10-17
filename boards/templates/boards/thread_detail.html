@@ -2,22 +2,6 @@
 {% load staticfiles %}
 {% load widget_tweaks %}
 {% block content %}
-<style type="text/css">
-a.scroll-to-reply {
-	width: 60px;
-	height: 60px;
-    color: white;
-	position: fixed;
-    text-align: center;
-	z-index: 999;
-	right: 20px;
-	bottom: 20px;
-    background: #97cd76;
-	-webkit-border-radius: 30px;
-	-moz-border-radius: 30px;
-	border-radius: 30px;
-}
-</style>
 <section class="section">
     <div class="container">
         <article class="media">
@@ -119,7 +103,7 @@ a.scroll-to-reply {
             <span>Back to Board Catalog</span>
         </a>
         </p>
-        <a class="scroll-to-reply">
+        <a id="scroll-to-reply" class="floating-button">
             <i style="line-height: 60px;" class="fa fa-mail-reply"></i>
         </a>
     </div>

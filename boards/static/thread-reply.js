@@ -28,7 +28,7 @@ $(window).scroll(function() {
 
 
 // Scrolls to the reply form on button click
-$('.scroll-to-reply').click(function() {
+$('#scroll-to-reply').click(function() {
     $('html, body').animate({
         scrollTop: $('#reply-form').offset().top
     }, 800);
