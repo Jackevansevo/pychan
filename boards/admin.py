@@ -1,15 +1,22 @@
 from django.contrib import admin
 from django.contrib.auth.models import Permission
 
-from .models import Board, Reply, Thread, Poster
+from .models import Board, Filter, Poster, Reply, Thread
 
 
 class BoardAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("short_name",)}
 
 
+class FilterInline(admin.TabularInline):
+    model = Filter
+
+
 class PosterAdmin(admin.ModelAdmin):
-    list_display = ('username', 'join_date', 'filters', 'karma')
+    list_display = ('username', 'join_date', 'karma')
+    inlines = [
+        FilterInline
+    ]
 
 
 class ThreadAdmin(admin.ModelAdmin):
