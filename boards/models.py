@@ -51,7 +51,7 @@ class Board(models.Model):
 
     def filter_threads(self, filters=None):
         if filters:
-            regex = r'(' + '|'.join(filters) + ')'
+            regex = '|'.join(filters)
             return self.threads.exclude(
                 Q(expired=True) |
                 Q(title__iregex=regex) |
