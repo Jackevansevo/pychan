@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Permission
 
-from .models import Board, Filter, Poster, Reply, Thread
+from .models import Board, Filter, Reply, Thread, Poster
 
 
 class BoardAdmin(admin.ModelAdmin):
@@ -15,7 +15,7 @@ class FilterInline(admin.TabularInline):
 class PosterAdmin(admin.ModelAdmin):
     list_display = ('username', 'join_date', 'karma')
     inlines = [
-        FilterInline
+        FilterInline,
     ]
 
 
