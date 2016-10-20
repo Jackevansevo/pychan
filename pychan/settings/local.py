@@ -38,14 +38,3 @@ MIDDLEWARE_CLASSES += [
 
 INTERNAL_IPS = ('127.0.0.1',)
 # END APPS CONFIGURATION ------------------------------------------------------
-
-
-# DATABASE CONFIGURATION ------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'pychan',
-    }
-}
-# END DATABASE CONFIGURATION --------------------------------------------------
