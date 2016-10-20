@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.postgres.fields import ArrayField
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Max
@@ -27,12 +26,20 @@ class TimeStampedModel(models.Model):
 
 class Poster(AbstractUser):
     join_date = models.DateTimeField(auto_now_add=True)
-    filters = ArrayField(
-        models.CharField(max_length=200),
-        blank=True,
-        default=[]
-    )
     karma = models.PositiveIntegerField(default=0, blank=True)
+
+    def __str__(self):
+        return self.username
+
+
+class Filter(models.Model):
+    text = models.CharField(max_length=200)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True, related_name='filters'
+    )
+
+    def __str__(self):
+        return self.text
 
 
 class Board(models.Model):
@@ -44,10 +51,11 @@ class Board(models.Model):
 
     def filter_threads(self, filters=None):
         if filters:
+            regex = r'(' + '|'.join(filters) + ')'
             return self.threads.exclude(
                 Q(expired=True) |
-                Q(title__iregex=r'(' + '|'.join(filters) + ')'),
-                Q(content__iregex=r'(' + '|'.join(filters) + ')')
+                Q(title__iregex=regex) |
+                Q(content__iregex=regex)
             )
         return self.threads.exclude(expired=True)
 
