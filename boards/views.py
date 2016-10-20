@@ -25,7 +25,7 @@ def board_detail(request, slug):
         form = ThreadCreateForm()
     filters = []
     if request.user.is_authenticated:
-        filters = request.user.filters
+        filters = request.user.filters.values_list('text', flat=True)
     threads = board.filter_threads(filters)[:50]
     context = {'threads': threads, 'form': form, 'board': board}
     return render(request, 'boards/board_detail.html', context)
