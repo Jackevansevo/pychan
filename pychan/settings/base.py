@@ -71,14 +71,11 @@ MANAGERS = ADMINS
 
 # DATABASE CONFIGURATION ------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': 'pychan',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(SITE_ROOT, 'db.sqlite3'),
     }
 }
 # END DATABASE CONFIGURATION --------------------------------------------------
