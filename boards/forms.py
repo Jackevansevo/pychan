@@ -4,8 +4,17 @@ from captcha.fields import ReCaptchaField
 from .models import Thread, Reply
 
 
-class ThreadCreateForm(forms.ModelForm):
+class CaptchaFormMixin(forms.Form):
     captcha = ReCaptchaField()
+
+    def __init__(self, *args, **kwargs):
+        super(CaptchaFormMixin, self).__init__(*args, **kwargs)
+        self.fields['captcha'].error_messages = {
+            'required': "Oops, please proove you're not a robot"
+        }
+
+
+class ThreadCreateForm(CaptchaFormMixin, forms.ModelForm):
 
     class Meta:
         model = Thread
@@ -21,8 +30,7 @@ class ThreadCreateForm(forms.ModelForm):
             raise forms.ValidationError("Couldn't read uploaded image")
 
 
-class ReplyForm(forms.ModelForm):
-    captcha = ReCaptchaField()
+class ReplyForm(CaptchaFormMixin, forms.ModelForm):
 
     class Meta:
         model = Reply
