@@ -10,6 +10,11 @@
                             <div class="column is-half is-offset-one-quarter">
                                 <h1 class="title">Login</h1>
                                 <form method="post">
+                                    {% if form.non_field_errors %}
+                                        {% for error in form.non_field_errors %}
+                                            <p class="control" ><b>{{ error }}</b></p>
+                                        {% endfor %}
+                                    {% endif %}
                                     {% csrf_token %}
                                     <p class="control has-icon">
                                     <input class="input" type="text" name="username" placeholder="Username">
