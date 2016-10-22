@@ -2,8 +2,16 @@
 {% load staticfiles %}
 {% load widget_tweaks %}
 {% block content %}
-<section class="section">
+<section class="section" style="min-height: 80vh;">
     <div class="container">
+        <p style="padding-bottom: 2rem;">
+        <a class="button is-primary" href="{% url 'boards:board-detail' thread.board.slug %}">
+            <span class="icon">
+                <i class="fa fa-mail-reply"></i>
+            </span>
+            <span>Back to Board</span>
+        </a>
+        </p>
         <article class="media">
             <div id="thread-{{ thread.id }}" class="modal">
                 <div class="modal-background"></div>
@@ -66,51 +74,60 @@
                 {% endfor %}
             </div>
         </article>
-        <article class="media">
-            <div class="media-content">
-                <form id="reply-form" action="{% url 'boards:thread-detail' thread.board.slug thread.pk  %}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <p class="control">
-                    {% render_field form.content placeholder="Add a comment..." class+="textarea"  %}
-                    </p>
-                    {% if form.non_field_errors %}
-                        {% for error in form.non_field_errors %}
-                        <div class="notification is-danger">
-                            <button class="delete"></button>
-                            <span>{{ error }}</span>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-                    <div id="validation-error" class="notification is-danger" style="display: none;">
-                        <button class="delete" type="button"></button>
-                        <span>Please enter a reply, or provide an image response</span>
-                    </div>
-                    <p class="control" style="display: inline;">
-                    <button id="reply-submit" class="button is-success" type="submit">
-                        Post Reply
-                    </button>
-                    </p>
-                    {% render_field form.captcha %}
-                    <p class="control" style="display: inline;">{{ form.image }}</p>
-                </form>
-            </div>
-        </article>
-        <p style="padding-top: 3rem;">
-        <a class="button is-primary" href="{% url 'boards:board-detail' thread.board.slug %}">
-            <span class="icon">
-                <i class="fa fa-mail-reply"></i>
-            </span>
-            <span>Back to Board Catalog</span>
-        </a>
-        </p>
-        <a id="scroll-to-reply" class="floating-button">
-            <i style="line-height: 60px;" class="fa fa-mail-reply"></i>
-        </a>
     </div>
 </section>
+
+<!-- Thread Reply Modal Form -->
+<div class="modal" id="threadReplyModel">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Reply To Thread </p>
+            <button class="delete"></button>
+        </header>
+        <form id="reply-form" method="post" enctype="multipart/form-data">
+            <section class="modal-card-body">
+                {% csrf_token %}
+                <p class="control">
+                    {% render_field form.content placeholder="Add your reply..." class+="textarea" %}
+                </p>
+                <div id="validation-error" class="notification is-danger" style="display: none;">
+                    <button class="delete" type="button"></button>
+                    <span>Please enter a reply, or provide an image response</span>
+                </div>
+                {% render_field form.captcha %}
+                {% if form.captcha.errors %}
+                {% for error in form.captcha.errors %}
+                    <code style="color: #FF3860;"><span class="modal-error">{{ error }}</span></code>
+                {% endfor %}
+                {% endif %}
+                {% if form.image.errors %}
+                    {% for error in form.image.errors %}
+                    <div class="notification is-danger">
+                        <span class="modal-error">{{ error }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success" type="submit">
+                    Create Thread
+                </button>
+                {% render_field form.image %}
+            </footer>
+        </form>
+    </div>
+</div>
+
+<!-- Launch Thread Create Modal Button -->
+<a class="show-modal floating-button" data-target="#threadReplyModel">
+    <i style="line-height: 60px;" class="fa fa-plus"></i>
+</a>
+
 {% endblock content %}
 {% block scripts %}
     {{ block.super }}
     <script src="{% static 'image-gallery.js' %}"></script>
     <script src="{% static 'thread-reply.js' %}"></script>
+    <script src="{% static 'modals.js' %}"></script>
 {% endblock %}
