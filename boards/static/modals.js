@@ -1,5 +1,5 @@
 // Closes the Modal Form when the close button is clicked
-$('.delete, .cancel').click(function() {
+$('.modal').on('click', '.modal-card-head > .delete', function () {
     $('.modal').removeClass('is-active');
 });
 
@@ -9,7 +9,6 @@ $('.show-modal').click(function() {
     $(modal).addClass('is-active');
     $(modal).find('input:text').first().focus();
 });
-
 
 // Reshows modal form if any errors are present after submission
 $(document).ready(function() {
