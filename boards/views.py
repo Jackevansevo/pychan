@@ -34,9 +34,10 @@ def board_detail(request, slug):
 def thread_view(request, slug, pk):
     thread = get_object_or_404(Thread, pk=pk)
     if request.method == 'POST':
-        form = ReplyForm(request.POST)
+        form = ReplyForm(request.POST, request.FILES)
         if form.is_valid():
             form.instance.thread = thread
+            form.instance.image = form.cleaned_data['image']
             form.instance.save()
             return HttpResponseRedirect(thread.get_absolute_url)
     else:
