@@ -13,9 +13,62 @@
     border-radius: 30px;
 }
 
-
 .unstyled {
     text-decoration: none !important;
     color: inherit;
 }
 
+.card {
+    opacity: 0;
+}
+
+.card:hover {
+    outline: 1px solid #00d1b2;
+    border: 1px solid
+    -moz-box-shadow: 0 0 5px
+    -webkit-box-shadow: 0 0 5px #00d1b2;
+    box-shadow: 0 0 5px #00d1b2;
+}
+
+.card.is-visible {
+    -webkit-animation: Items 500ms ease-in forwards;
+    animation: Items 500ms ease-in forwards;
+}
+
+@-webkit-keyframes Items {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale(.3) rotateY(90deg);
+        transform: scale(.3) rotateY(90deg);
+    }
+    60% {
+        -webkit-transform: scale(1.4);
+        transform: scale(1.4);
+    }
+    90% {
+        -webkit-transform: scale(.9);
+        transform: scale(.9);
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes Items {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale(.3) rotateY(90deg);
+        transform: scale(.3) rotateY(90deg);
+    }
+    60% {
+        -webkit-transform: scale(1.4);
+        transform: scale(1.4);
+    }
+    90% {
+        -webkit-transform: scale(.9);
+        transform: scale(.9);
+    }
+    100% {
+        opacity: 1;
+    }
+}

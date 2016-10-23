@@ -4,7 +4,8 @@
   "description": "python imageboard",
   "main": "none",
   "dependencies": {
-    "bulma": "^0.2.1"
+    "bulma": "^0.2.3",
+    "hover.css": "^2.0.2"
   },
   "devDependencies": {},
   "scripts": {
