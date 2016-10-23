@@ -141,21 +141,9 @@
                 </p>
                 <label class="label">{{ form.content.label }}</label>
                 <p class="control">
-                    {% render_field form.content placeholder="Add a comment..." class+="textarea" %}
+                    {% render_field form.content placeholder="Add some content..." class+="textarea" %}
                 </p>
-                {% if form.captcha.errors %}
-                    <p class="control has-icon has-icon-right">
-                        {% render_field form.captcha class+="input is-danger" %}
-                    <i class="fa fa-warning"></i>
-                        {% for error in form.captcha.errors %}
-                            <span class="modal-error help is-danger">{{ error }}</span>
-                        {% endfor %}
-                    </p>
-                {% else %}
-                    <p class="control">
-                        {% render_field form.captcha class+="input" %}
-                    </p>
-                {% endif %}
+                {% render_field form.captcha %}
                 {% if form.image.errors %}
                     {% for error in form.image.errors %}
                     <div class="notification is-danger">
@@ -183,4 +171,5 @@
 {% block scripts %}
     {{ block.super }}
     <script src="{% static 'modals.js' %}"></script>
+    <script src="{% static 'animation.js' %}"></script>
 {% endblock scripts %}
